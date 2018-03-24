@@ -15,7 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/holo_blue_light"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
@@ -23,7 +23,8 @@
     <include
         layout="@layout/content_dashboard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteY="2dp" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_location_button"
@@ -33,6 +34,7 @@
         android:layout_margin="@dimen/fab_margin"
         android:tint="@android:color/black"
         app:backgroundTint="@android:color/holo_blue_light"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:elevation="22dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -4,26 +4,30 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jackal.android.spots.R;
 
-public class DashboardActivity extends SingleFragmentActivity {
+public class DashboardActivity extends AppCompatActivity {
 
-    @Override
+    private static final String TAG = "DashboardActivity";
+
     protected Fragment createFragment() {
-        return myLocationListFragment.newInstance();
+        Log.i(TAG, "Create Fragment was called in dashboard");
+        return new LocationListFragment();
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void onCreate(Bundle savedInstanceBundle) {
+        super.onCreate(savedInstanceBundle);
         setContentView(R.layout.activity_dashboard);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_location_button);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -33,6 +37,17 @@ public class DashboardActivity extends SingleFragmentActivity {
                         .setAction("Action", null).show();
             }
         });
+
+
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.content_dashboard);
+
+        if (fragment == null) {
+            fragment = createFragment();
+            fm.beginTransaction()
+                    .add(R.id.content_dashboard, fragment)
+                    .commit();
+        }
     }
 
     @Override
@@ -56,4 +71,5 @@ public class DashboardActivity extends SingleFragmentActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

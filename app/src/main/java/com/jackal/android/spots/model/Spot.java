@@ -14,6 +14,13 @@ public class Spot {
 
     private double mLon;
 
+    public Spot(double lat, double lon, String title, String description) {
+        mLat = lat;
+        mLon = lon;
+        mTitle = title;
+        mDescription = description;
+    }
+
     public String getTitle() {
         return mTitle;
     }
