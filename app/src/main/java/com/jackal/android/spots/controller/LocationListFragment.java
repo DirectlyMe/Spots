@@ -89,7 +89,7 @@ public class LocationListFragment extends Fragment {
 
         private Spot mSpot;
 
-        public SpotHolder(LayoutInflater inflater, ViewGroup parent) {
+        private SpotHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.location_card_item, parent, false));
 
             mTitle = itemView.findViewById(R.id.location_title);
@@ -100,16 +100,14 @@ public class LocationListFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Log.i(TAG, "card clicked");
-                    Intent i = new Intent(getActivity(), LocationPageActivity.class);
+                    Intent i = LocationPageActivity.newIntent(getActivity(), mSpot.getLocation_id());
                     startActivity(i);
                 }
             });
-            //mImageView2 = itemView.findViewById(R.id.location_photo_2);
-            //mImageView3 = itemView.findViewById(R.id.location_photo_3);
 
         }
 
-        public void bind(Spot spot) {
+        private void bind(Spot spot) {
             mSpot = spot;
             mTitle.setText(spot.getTitle());
             mDescription.setText(spot.getDescription());
@@ -121,7 +119,7 @@ public class LocationListFragment extends Fragment {
 
         private List<Spot> mSpots;
 
-        public SpotAdapter(List<Spot> spots) {
+        private SpotAdapter(List<Spot> spots) {
             mSpots = spots;
         }
 

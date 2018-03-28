@@ -26,6 +26,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
         //activityAddOns();
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_single_fragment);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);

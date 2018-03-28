@@ -2,8 +2,10 @@ package com.jackal.android.spots.model;
 
 import android.content.Context;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by Jack on 3/21/18.
@@ -14,7 +16,7 @@ public class SpotSingleton {
     private static SpotSingleton sSpotSingleton;
     private Context mContext;
 
-    private List<Spot> spots;
+    private List<Spot> mMySpots;
 
     public static SpotSingleton get(Context context) {
 
@@ -28,31 +30,42 @@ public class SpotSingleton {
 
         mContext = context.getApplicationContext();
 
-        spots = new ArrayList<>();
+        mMySpots = new ArrayList<>();
 
     }
 
     public void addSpot(Spot spot) {
-        spots.add(spot);
+        mMySpots.add(spot);
     }
 
-    public Spot getSpot(int position) {
-        return spots.get(position);
+    public Spot getSpot(UUID ID) {
+
+        for (Spot spot : mMySpots) {
+            if (spot.getLocation_id() == ID) {
+                return spot;
+            }
+        }
+
+        return null;
     }
 
     public List<Spot> getSpots() {
-        if (spots.size() == 0) {
+        if (mMySpots.size() == 0) {
             for (int i = 0; i < 10; i++) {
                 Spot spot = new Spot(100, 100, "New Location", "Happy Hunting!");
-                spots.add(spot);
+                mMySpots.add(spot);
             }
         }
-        return spots;
+        return mMySpots;
     }
 
     public void clearSpots() {
-        spots.clear();
+        mMySpots.clear();
     }
 
+    public File getPhotoFile(Spot spot) {
+        File filesDir = mContext.getFilesDir();
+        return new File(filesDir, spot.getPhotoFileName());
+    }
 
 }

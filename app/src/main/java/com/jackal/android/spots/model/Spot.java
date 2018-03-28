@@ -1,58 +1,86 @@
 package com.jackal.android.spots.model;
 
+import java.util.List;
+import java.util.UUID;
+
 /**
  * Created by Jack on 3/21/18.
  */
 
 public class Spot {
 
-    private String mTitle;
+    private UUID location_id;
 
-    private String mDescription;
+    private String title;
 
-    private double mLat;
+    private String description;
 
-    private double mLon;
+    private double lat;
+
+    private double lon;
+
+    private List<String> imageUrls;
 
     public Spot(double lat, double lon, String title, String description) {
-        mLat = lat;
-        mLon = lon;
-        mTitle = title;
-        mDescription = description;
+        this.lat = lat;
+        this.lon = lon;
+        this.title = title;
+        this.description = description;
+        location_id = UUID.randomUUID();
+    }
+
+    public UUID getLocation_id() {
+        return location_id;
+    }
+
+    public void setLocation_id(UUID location_id) {
+        this.location_id = location_id;
     }
 
     public String getTitle() {
-        return mTitle;
+        return title;
     }
 
     public void setTitle(String title) {
-        mTitle = title;
+        this.title = title;
     }
 
 
     public String getDescription() {
-        return mDescription;
+        return description;
     }
 
     public void setDescription(String description) {
-        mDescription = description;
+        this.description = description;
     }
 
 
     public double getLat() {
-        return mLat;
+        return lat;
     }
 
     public void setLat(double lat) {
-        mLat = lat;
+        this.lat = lat;
     }
 
 
     public double getLon() {
-        return mLon;
+        return lon;
     }
 
     public void setLon(double lon) {
-        mLon = lon;
+        this.lon = lon;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public String getPhotoFileName() {
+        return "IMG_" + getLocation_id() + ".jpg";
     }
 }
