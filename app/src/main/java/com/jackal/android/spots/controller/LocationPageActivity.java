@@ -25,20 +25,20 @@ import java.util.UUID;
 
 public class LocationPageActivity extends SingleFragmentActivity {
 
-    private static final String LOCATION_ID = "com.jackal.android.spots.location_id";
+    private static final String LOCATION_POSITION = "com.jackal.android.spots.location_position";
 
 
     @Override
     protected Fragment createFragment() {
 
-        UUID spotID = (UUID) getIntent().getSerializableExtra(LOCATION_ID);
+        int spotPosition = (int) getIntent().getSerializableExtra(LOCATION_POSITION);
 
-        return LocationPageFragment.newInstance(spotID);
+        return LocationPageFragment.newInstance(spotPosition);
     }
 
-    public static Intent newIntent(Context context, UUID locationID) {
+    public static Intent newIntent(Context context, int position) {
         Intent intent = new Intent(context, LocationPageActivity.class);
-        intent.putExtra(LOCATION_ID, locationID);
+        intent.putExtra(LOCATION_POSITION, position);
 
         return intent;
     }

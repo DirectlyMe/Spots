@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class Spot {
 
-    private UUID location_id;
+    //private UUID location_id;
 
     private String title;
 
@@ -21,21 +21,23 @@ public class Spot {
 
     private List<String> imageUrls;
 
+    public Spot() { }
+
     public Spot(double lat, double lon, String title, String description) {
         this.lat = lat;
         this.lon = lon;
         this.title = title;
         this.description = description;
-        location_id = UUID.randomUUID();
+        //location_id = UUID.randomUUID();
     }
 
-    public UUID getLocation_id() {
+    /*public UUID getLocation_id() {
         return location_id;
     }
 
     public void setLocation_id(UUID location_id) {
         this.location_id = location_id;
-    }
+    }*/
 
     public String getTitle() {
         return title;
@@ -81,6 +83,6 @@ public class Spot {
     }
 
     public String getPhotoFileName() {
-        return "IMG_" + getLocation_id() + ".jpg";
+        return "IMG_"  + ".jpg";
     }
 }

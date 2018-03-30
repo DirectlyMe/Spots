@@ -38,24 +38,12 @@ public class SpotSingleton {
         mMySpots.add(spot);
     }
 
-    public Spot getSpot(UUID ID) {
+    public Spot getSpot(int position) {
 
-        for (Spot spot : mMySpots) {
-            if (spot.getLocation_id() == ID) {
-                return spot;
-            }
-        }
-
-        return null;
+        return mMySpots.get(position);
     }
 
     public List<Spot> getSpots() {
-        if (mMySpots.size() == 0) {
-            for (int i = 0; i < 10; i++) {
-                Spot spot = new Spot(100, 100, "New Location", "Happy Hunting!");
-                mMySpots.add(spot);
-            }
-        }
         return mMySpots;
     }
 

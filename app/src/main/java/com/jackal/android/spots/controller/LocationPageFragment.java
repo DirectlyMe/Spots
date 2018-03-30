@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
@@ -39,22 +40,24 @@ import java.util.UUID;
 public class LocationPageFragment extends Fragment {
 
     private final static String TAG = "LocationPageFragment";
-    private final static String LOCATION_ID = "locationID";
+    private final static String LOCATION_POSITION = "locationID";
 
     private ViewPager mViewPager;
     private List<Drawable> mLocationImages;
     private ImagePagerAdapter mAdapter;
     private FloatingActionButton mMapLocation;
+    private TextView mTitleView;
+    private TextView mDescriptionView;
 
     private Spot mSpot;
 
-    private UUID mSpotID;
+    private int mSpotPosition;
 
-    public static LocationPageFragment newInstance(UUID locationID) {
+    public static LocationPageFragment newInstance(int locationPosition) {
 
         Bundle args = new Bundle();
 
-        args.putSerializable(LOCATION_ID, locationID);
+        args.putSerializable(LOCATION_POSITION, locationPosition);
 
         LocationPageFragment fragment = new LocationPageFragment();
         fragment.setArguments(args);
@@ -65,9 +68,9 @@ public class LocationPageFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSpotID = (UUID) getArguments().getSerializable(LOCATION_ID);
+        mSpotPosition = (int) getArguments().getSerializable(LOCATION_POSITION);
 
-        mSpot = SpotSingleton.get(getActivity()).getSpot(mSpotID);
+        mSpot = SpotSingleton.get(getActivity()).getSpot(mSpotPosition);
 
         mLocationImages = new ArrayList<>();
 
@@ -81,6 +84,12 @@ public class LocationPageFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.location_page, container, false);
+
+        mTitleView = view.findViewById(R.id.location_page_title_view);
+        mTitleView.setText(mSpot.getTitle());
+
+        mDescriptionView = view.findViewById(R.id.location_page_description_view);
+        mDescriptionView.setText(mSpot.getDescription());
 
         mViewPager = view.findViewById(R.id.location_image_pager);
         mViewPager.setOffscreenPageLimit(2);

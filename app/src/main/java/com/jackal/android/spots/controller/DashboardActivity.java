@@ -18,7 +18,10 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.jackal.android.spots.R;
+import com.jackal.android.spots.model.User;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,14 +30,14 @@ public class DashboardActivity extends AppCompatActivity {
 
     private static final String TAG = "DashboardActivity";
 
-    private static final int RC_SIGN_IN = 1;
 
-    private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+    private User mUser;
+
 
     protected Fragment createFragment() {
         Log.i(TAG, "Create Fragment was called in dashboard");
-        return new LocationListFragment();
+        return LocationListFragment.newInstance();
     }
 
     @Override
@@ -42,23 +45,12 @@ public class DashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceBundle);
         setContentView(R.layout.activity_dashboard);
 
-        mFirebaseAuth = FirebaseAuth.getInstance();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_location_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), AddLocationActivity.class);
-                startActivity(intent);
-            }
-        });
-
-
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.content_dashboard);
+
 
         if (fragment == null) {
             fragment = createFragment();
@@ -67,55 +59,6 @@ public class DashboardActivity extends AppCompatActivity {
                     .commit();
         }
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if (user != null) {
-                    Toast.makeText(DashboardActivity.this, "You are now signed in!", Toast.LENGTH_SHORT).show();
-                } else {
-                    List<AuthUI.IdpConfig> providers = Arrays.asList(
-                            new AuthUI.IdpConfig.Builder(AuthUI.EMAIL_PROVIDER).build(),
-                            new AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build());
-
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(providers)
-                                    .build(),
-                            RC_SIGN_IN);
-                }
-            }
-        };
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (mAuthStateListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
-        }
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Toast.makeText(DashboardActivity.this, "You are now signed in!", Toast.LENGTH_SHORT).show();
-            }
-            else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(DashboardActivity.this, "Sign in cancelled.", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
     }
 
     @Override
