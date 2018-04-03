@@ -51,9 +51,14 @@ public class SpotSingleton {
         mMySpots.clear();
     }
 
-    public File getPhotoFile(Spot spot) {
+    public File[] getPhotoFiles(Spot spot) {
         File filesDir = mContext.getFilesDir();
-        return new File(filesDir, spot.getPhotoFileName());
+        List<String> spotFileNames = spot.getPhotoFileNames();
+        File[] photoFiles = new File[3];
+        for (int i = 0; i < spotFileNames.size(); i++) {
+            photoFiles[i] = new File(filesDir, spotFileNames.get(i));
+        }
+        return photoFiles;
     }
 
 }

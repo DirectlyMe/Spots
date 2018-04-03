@@ -11,12 +11,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -255,6 +258,10 @@ public class LocationListFragment extends Fragment {
             mTitle.setText(mSpot.getTitle());
             mDescription.setText(mSpot.getDescription());
             mLocationImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_map_black_24dp));
+            Glide.with(mLocationImageView.getContext())
+                    .load(mSpot.getImageUrl1())
+                    .into(mLocationImageView);
+            mLocationImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         }
     }

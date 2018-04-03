@@ -18,11 +18,6 @@ public class User implements Serializable {
         return mUserId;
     }
 
-    public void setUserId(String userId) {
-        mUserId = userId;
-    }
-
-
     public String getUserName() {
         return mUserName;
     }
