@@ -38,7 +38,7 @@ public class LocationPageFragment extends Fragment {
     private ViewPager mViewPager;
     private List<String> mLocationImagesUrls;
     private ImagePagerAdapter mAdapter;
-    private FloatingActionButton mMapLocation;
+    private FloatingActionButton mMapLocationButton;
     private TextView mTitleView;
     private TextView mDescriptionView;
 
@@ -60,6 +60,8 @@ public class LocationPageFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setRetainInstance(true);
 
         mSpotPosition = (int) getArguments().getSerializable(LOCATION_POSITION);
 
@@ -85,7 +87,7 @@ public class LocationPageFragment extends Fragment {
         mViewPager = view.findViewById(R.id.location_image_pager);
         mViewPager.setOffscreenPageLimit(2);
 
-        mMapLocation = view.findViewById(R.id.map_location_button);
+        mMapLocationButton = view.findViewById(R.id.map_location_button);
 
         updateUI();
 

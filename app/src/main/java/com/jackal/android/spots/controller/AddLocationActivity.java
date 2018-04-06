@@ -12,6 +12,7 @@ import com.jackal.android.spots.model.User;
 
 public class AddLocationActivity extends SingleFragmentActivity {
 
+
     private static final String SPOT_USER = "com.jackal.android.spots.model.user";
 
     @Override
@@ -30,6 +31,5 @@ public class AddLocationActivity extends SingleFragmentActivity {
 
         return intent;
     }
-
 
 }

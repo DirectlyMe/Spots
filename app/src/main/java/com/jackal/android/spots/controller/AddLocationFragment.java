@@ -1,15 +1,20 @@
 package com.jackal.android.spots.controller;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +26,21 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -47,12 +66,18 @@ public class AddLocationFragment extends Fragment {
     private static final String TAG = "AddLocationFragment";
 
     private static final int REQUEST_PHOTO = 1;
+    private static final int REQUEST_LOCATION_PERMISSIONS = 0;
 
+    private static final String[] LOCATION_PERMISSIONS = new String[]{
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION};
 
     private Spot mSpot;
     private User mUser;
 
     private int mSelectedImageView;
+    private double mSpotLongitude = 0;
+    private double mSpotLatitude = 0;
 
     private File[] mPhotoFiles;
 
@@ -67,6 +92,11 @@ public class AddLocationFragment extends Fragment {
     private DatabaseReference mDatabaseReference;
     private FirebaseStorage mFirebaseStorage;
     private StorageReference mSpotPhotosRef;
+
+    private FusedLocationProviderClient mClient;
+    private LocationRequest mLocationRequest;
+    private LocationCallback mLocationCallback;
+    private Location mCurrentLocation;
 
     public static AddLocationFragment newInstance(User user) {
 
@@ -91,10 +121,30 @@ public class AddLocationFragment extends Fragment {
         mFirebaseStorage = FirebaseStorage.getInstance();
 
         mDatabaseReference = mFirebaseDatabase.getReference().child("users").child(mUser.getUserId())
-        .child("locations");
+                .child("locations");
         mSpotPhotosRef = mFirebaseStorage.getReference().child("spots_photos");
 
         mPhotoFiles = SpotSingleton.get(getActivity()).getPhotoFiles(mSpot);
+
+        mClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+
+                mCurrentLocation = locationResult.getLastLocation();
+
+                Log.i(TAG, "Current Location Lat: " + mCurrentLocation.getLatitude() +
+                                 "\nCurrent location Lon: " + mCurrentLocation.getLongitude());
+
+                mSpotLongitude = mCurrentLocation.getLongitude();
+                mSpotLatitude = mCurrentLocation.getLatitude();
+            }
+        };
+
+        findUserLocation();
     }
 
     @Nullable
@@ -102,8 +152,6 @@ public class AddLocationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.add_location_page_fragment, container, false);
-
-        PackageManager packageManager = getActivity().getPackageManager();
 
         mTitle = view.findViewById(R.id.add_location_title);
         mDescription = view.findViewById(R.id.add_location_description);
@@ -115,8 +163,8 @@ public class AddLocationFragment extends Fragment {
 
                 mSpot.setDescription(mDescription.getText().toString());
                 mSpot.setTitle(mTitle.getText().toString());
-                mSpot.setLat(100);
-                mSpot.setLon(100);
+                mSpot.setLat(mSpotLatitude);
+                mSpot.setLon(mSpotLongitude);
 
                 Uri imageUri = Uri.fromFile(mPhotoFiles[0]);
                 StorageReference photoRef1 = mSpotPhotosRef.child(imageUri.getLastPathSegment());
@@ -150,7 +198,7 @@ public class AddLocationFragment extends Fragment {
                     }
                 });
 
-
+                stopLocationUpdates();
                 getActivity().finish();
             }
         });
@@ -176,7 +224,7 @@ public class AddLocationFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(getActivity());
             default:
@@ -195,6 +243,75 @@ public class AddLocationFragment extends Fragment {
                     "\nFile uri = " + mPhotoFiles[fileNum].getPath());
             updatePhotoView(fileNum);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISSIONS:
+                if (hasLocationPermissions()) {
+                    findUserLocation();
+                } else {
+                    requestPermissions(LOCATION_PERMISSIONS, REQUEST_LOCATION_PERMISSIONS);
+                }
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        }
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    private void createLocationRequest() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(20000);
+        locationRequest.setNumUpdates(3);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationRequest = locationRequest;
+    }
+
+    @SuppressLint("MissingPermission")
+    private void startLocationUpdates() {
+        mClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
+    }
+
+    private void stopLocationUpdates() {
+        mClient.removeLocationUpdates(mLocationCallback);
+    }
+
+    private void findUserLocation() {
+
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(LOCATION_PERMISSIONS, REQUEST_LOCATION_PERMISSIONS);
+        }
+
+        createLocationRequest();
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        SettingsClient client = LocationServices.getSettingsClient(getActivity());
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+
+        startLocationUpdates();
+    }
+
+    private boolean hasLocationPermissions() {
+        int result = ContextCompat
+                .checkSelfPermission(getActivity(), LOCATION_PERMISSIONS[0]);
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
     private class ClickImageView implements View.OnClickListener {
