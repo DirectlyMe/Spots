@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
 import com.jackal.android.spots.model.SpotSingleton;
@@ -88,6 +89,13 @@ public class LocationPageFragment extends Fragment {
         mViewPager.setOffscreenPageLimit(2);
 
         mMapLocationButton = view.findViewById(R.id.map_location_button);
+        mMapLocationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = MapsActivity.newIntent(getActivity(), mSpotPosition);
+                startActivity(intent);
+            }
+        });
 
         updateUI();
 
@@ -151,6 +159,7 @@ public class LocationPageFragment extends Fragment {
             ImageView image = (ImageView) v.findViewById(R.id.pager_image);
             Glide.with(image)
                     .load(spotImagesUrls.get(position))
+                    .apply(new RequestOptions().override(mViewPager.getWidth(), mViewPager.getHeight()))
                     .into(image);
 
 

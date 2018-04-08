@@ -126,6 +126,12 @@ public class AddLocationFragment extends Fragment {
 
         mPhotoFiles = SpotSingleton.get(getActivity()).getPhotoFiles(mSpot);
 
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(LOCATION_PERMISSIONS, REQUEST_LOCATION_PERMISSIONS);
+        }
+
         mClient = LocationServices.getFusedLocationProviderClient(getActivity());
         mLocationCallback = new LocationCallback() {
             @Override
@@ -259,16 +265,6 @@ public class AddLocationFragment extends Fragment {
 
         }
 
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 
     private void createLocationRequest() {

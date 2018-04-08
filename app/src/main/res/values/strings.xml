@@ -3,4 +3,5 @@
     <string name="action_settings">Settings</string>
     <string name="sign_out">Sign Out</string>
     <string name="add_location_button">Add Spot</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

@@ -101,5 +101,6 @@ public class DashboardActivity extends AppCompatActivity {
 
             errorDialog.show();
         }
+
     }
 }
