@@ -17,13 +17,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
-import com.jackal.android.spots.model.SpotSingleton;
+import com.jackal.android.spots.model.MySpotSingleton;
 
 public class MapFragment extends SupportMapFragment implements OnMapReadyCallback{
 
@@ -55,7 +56,7 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         super.onCreate(bundle);
 
         mSpotPosition = getArguments().getInt(SPOT_POSITION_ARG);
-        mSpot = SpotSingleton.get(getActivity()).getSpot(mSpotPosition);
+        mSpot = MySpotSingleton.get(getActivity()).getSpot(mSpotPosition);
 
         mClient = LocationServices.getFusedLocationProviderClient(getActivity());
         mLocationCallback = new LocationCallback() {
@@ -93,7 +94,8 @@ public class MapFragment extends SupportMapFragment implements OnMapReadyCallbac
         LatLng spotCoordinates = new LatLng(mSpot.getLat(), mSpot.getLon());
         LatLng userCoordinates = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
         mGoogleMap.addMarker(new MarkerOptions().position(spotCoordinates).title(mSpot.getTitle()));
-        mGoogleMap.addMarker(new MarkerOptions().position(userCoordinates).title("You"));
+        mGoogleMap.addMarker(new MarkerOptions().position(userCoordinates).title("You")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
 
         LatLngBounds bounds = new LatLngBounds.Builder()
                 .include(spotCoordinates)

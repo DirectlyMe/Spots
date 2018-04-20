@@ -12,6 +12,8 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +24,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
-import com.jackal.android.spots.model.SpotSingleton;
+import com.jackal.android.spots.model.MySpotSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,10 +65,11 @@ public class LocationPageFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         mSpotPosition = (int) getArguments().getSerializable(LOCATION_POSITION);
 
-        mSpot = SpotSingleton.get(getActivity()).getSpot(mSpotPosition);
+        mSpot = MySpotSingleton.get(getActivity()).getSpot(mSpotPosition);
 
         mLocationImagesUrls = new ArrayList<>(3);
         mLocationImagesUrls.add(mSpot.getImageUrl1());
@@ -88,14 +91,14 @@ public class LocationPageFragment extends Fragment {
         mViewPager = view.findViewById(R.id.location_image_pager);
         mViewPager.setOffscreenPageLimit(2);
 
-        mMapLocationButton = view.findViewById(R.id.map_location_button);
+        /*mMapLocationButton = view.findViewById(R.id.map_location_button);
         mMapLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = MapsActivity.newIntent(getActivity(), mSpotPosition);
                 startActivity(intent);
             }
-        });
+        });*/
 
         updateUI();
 
@@ -103,13 +106,25 @@ public class LocationPageFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_location_page, menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case android.R.id.home:
                 NavUtils.navigateUpFromSameTask(getActivity());
+                break;
+            case R.id.map_location_button:
+                Intent intent = MapsActivity.newIntent(getActivity(), mSpotPosition);
+                startActivity(intent);
+                break;
             default:
-                return super.onOptionsItemSelected(item);
+
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateUI() {
@@ -159,10 +174,10 @@ public class LocationPageFragment extends Fragment {
             ImageView image = (ImageView) v.findViewById(R.id.pager_image);
             Glide.with(image)
                     .load(spotImagesUrls.get(position))
-                    .apply(new RequestOptions().override(mViewPager.getWidth(), mViewPager.getHeight()))
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_terrain_black_24dp))
                     .into(image);
 
-
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
             image.setImageDrawable(mCurrentImage);
             container.addView(v);
 

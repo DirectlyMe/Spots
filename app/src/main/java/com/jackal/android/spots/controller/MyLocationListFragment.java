@@ -1,5 +1,6 @@
 package com.jackal.android.spots.controller;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -11,11 +12,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
-import com.jackal.android.spots.model.SpotSingleton;
+import com.jackal.android.spots.model.MySpotSingleton;
 import com.jackal.android.spots.model.User;
 
 import java.util.Arrays;
@@ -41,15 +41,17 @@ import java.util.List;
  * Created by Jack on 3/21/18.
  */
 
-public class LocationListFragment extends Fragment {
+public class MyLocationListFragment extends Fragment {
 
     private final static String TAG = "myLocationFragment";
 
     private static final int RC_SIGN_IN = 1;
 
     private User mUser;
-    private SpotSingleton mSpotSingleton;
+    private MySpotSingleton mMySpotSingleton;
+    private CallBacks mCallBacks;
 
+    private ProgressBar mProgressBarPlaceholder;
     private RecyclerView mLocationList;
     private SpotAdapter mAdapter;
 
@@ -59,21 +61,27 @@ public class LocationListFragment extends Fragment {
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    public interface CallBacks {
+        void grabUser();
+    }
 
-    public static LocationListFragment newInstance() {
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mCallBacks = (CallBacks) context;
+    }
 
-        Bundle args = new Bundle();
-
-        LocationListFragment fragment = new LocationListFragment();
-        fragment.setArguments(args);
-        return fragment;
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallBacks = null;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mSpotSingleton = SpotSingleton.get(getActivity());
+        mMySpotSingleton = MySpotSingleton.get(getActivity());
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -84,17 +92,11 @@ public class LocationListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.location_list_fragment, container, false);
 
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.add_location_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = AddLocationActivity.newIntent(getActivity(), mUser);
-                startActivity(intent);
-            }
-        });
+        mProgressBarPlaceholder = (ProgressBar) view.findViewById(R.id.progress_bar_placeholder);
 
         mLocationList = view.findViewById(R.id.location_recycler_view);
         mLocationList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mLocationList.setVisibility(View.INVISIBLE);
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -102,7 +104,8 @@ public class LocationListFragment extends Fragment {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
                 if (user != null) {
-                    mUser = new User(user.getUid(), user.getDisplayName());
+                    mUser = new User(user.getUid(), user.getDisplayName(), user.getEmail());
+                    mCallBacks.grabUser();
                     onSignedInInitialized();
                 }
                 else {
@@ -128,7 +131,7 @@ public class LocationListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mSpotSingleton.clearSpots();
+        mMySpotSingleton.clearSpots();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 
@@ -156,8 +159,17 @@ public class LocationListFragment extends Fragment {
         }
     }
 
+    public User getUser() {
+        if (mUser != null) {
+            return mUser;
+        }
+        else {
+            return null;
+        }
+    }
+
     public void updateUI() {
-        List<Spot> spots = mSpotSingleton.getSpots();
+        List<Spot> spots = mMySpotSingleton.getSpots();
 
         if (mAdapter == null) {
             mAdapter = new SpotAdapter(spots);
@@ -178,7 +190,7 @@ public class LocationListFragment extends Fragment {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     Spot spot = dataSnapshot.getValue(Spot.class);
-                    mSpotSingleton.addSpot(spot);
+                    mMySpotSingleton.addSpot(spot);
                     updateUI();
                 }
 
@@ -218,6 +230,11 @@ public class LocationListFragment extends Fragment {
     private void onSignedInInitialized() {
         mDatabaseReference = mFirebaseDatabase.getReference()
                 .child("users")
+                .child(mUser.getUserId());
+        mDatabaseReference.child("email").setValue(mUser.getEmail());
+        mDatabaseReference.child("user_id").setValue(mUser.getUserId());
+        mDatabaseReference = mFirebaseDatabase.getReference()
+                .child("users")
                 .child(mUser.getUserId())
                 .child("locations");
         attachDatabaseReadListener();
@@ -255,12 +272,14 @@ public class LocationListFragment extends Fragment {
         }
 
         private void bind(Spot spot) {
+            mProgressBarPlaceholder.setVisibility(View.INVISIBLE);
+            mLocationList.setVisibility(View.VISIBLE);
             mSpot = spot;
             mTitle.setText(mSpot.getTitle());
             mDescription.setText(mSpot.getDescription());
-            mLocationImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_map_black_24dp));
             Glide.with(mLocationImageView.getContext())
                     .load(mSpot.getImageUrl1())
+                    .apply(new RequestOptions().placeholder(R.drawable.ic_terrain_black_24dp))
                     .into(mLocationImageView);
             mLocationImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 

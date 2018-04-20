@@ -4,21 +4,28 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 
-    private String mUserId;
+    private String userId;
 
-    private String mUserName;
+    private String name;
 
-    public User(String id, String name) {
-        mUserId = id;
-        mUserName = name;
+    private String email;
+
+    public User(String id, String name, String email) {
+        userId = id;
+        this.name = name;
+        this.email = email;
     }
 
 
     public String getUserId() {
-        return mUserId;
+        return userId;
     }
 
-    public String getUserName() {
-        return mUserName;
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

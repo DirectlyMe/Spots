@@ -4,4 +4,10 @@
     <string name="sign_out">Sign Out</string>
     <string name="add_location_button">Add Spot</string>
     <string name="title_activity_maps">Map</string>
+    <string name="map_location_button">Map Spot</string>
+    <string name="my_spots_list">My Spots</string>
+    <string name="friends_spots_list">Their Spots</string>
+    <string name="facebook_app_id">353929021680245</string>
+    <string name="fb_login_protocol_scheme">fb353929021680245</string>
+    <string name="find_friends_button">Find Friends</string>
 </resources>

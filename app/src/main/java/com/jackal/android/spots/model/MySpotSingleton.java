@@ -5,28 +5,27 @@ import android.content.Context;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by Jack on 3/21/18.
  */
 
-public class SpotSingleton {
+public class MySpotSingleton {
 
-    private static SpotSingleton sSpotSingleton;
+    private static MySpotSingleton sMySpotSingleton;
     private Context mContext;
 
     private List<Spot> mMySpots;
 
-    public static SpotSingleton get(Context context) {
+    public static MySpotSingleton get(Context context) {
 
-        if (sSpotSingleton == null) {
-            sSpotSingleton = new SpotSingleton(context);
+        if (sMySpotSingleton == null) {
+            sMySpotSingleton = new MySpotSingleton(context);
         }
-        return sSpotSingleton;
+        return sMySpotSingleton;
     }
 
-    private SpotSingleton(Context context) {
+    private MySpotSingleton(Context context) {
 
         mContext = context.getApplicationContext();
 

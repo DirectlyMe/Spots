@@ -43,36 +43,8 @@ public class LocationPageActivity extends SingleFragmentActivity {
         return intent;
     }
 
-
-    /*@Override
-    protected void onCreate(Bundle savedInstanceBundle) {
-        super.onCreate(savedInstanceBundle);
-        setContentView(R.layout.activity_dashboard);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.add_location_button);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
-
-
-        FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.content_dashboard);
-
-        if (fragment == null) {
-            fragment = createFragment();
-            fm.beginTransaction()
-                    .add(R.id.content_dashboard, fragment)
-                    .commit();
-        }
-    }*/
+    @Override
+    protected void activityAddOns() {
+        super.activityAddOns();
+    }
 }

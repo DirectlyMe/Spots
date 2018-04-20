@@ -26,19 +26,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -48,7 +43,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jackal.android.spots.R;
 import com.jackal.android.spots.model.Spot;
-import com.jackal.android.spots.model.SpotSingleton;
+import com.jackal.android.spots.model.MySpotSingleton;
 import com.jackal.android.spots.model.User;
 
 import java.io.File;
@@ -124,7 +119,7 @@ public class AddLocationFragment extends Fragment {
                 .child("locations");
         mSpotPhotosRef = mFirebaseStorage.getReference().child("spots_photos");
 
-        mPhotoFiles = SpotSingleton.get(getActivity()).getPhotoFiles(mSpot);
+        mPhotoFiles = MySpotSingleton.get(getActivity()).getPhotoFiles(mSpot);
 
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
